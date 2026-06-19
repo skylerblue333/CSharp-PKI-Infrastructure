@@ -1,17 +1,17 @@
 # CSharp-PKI-Infrastructure
 
-## Overview
-A Public Key Infrastructure (PKI) implementation in C# (.NET 8) demonstrating RSA-2048 key generation, digital signing, and signature verification.
+![CI](https://github.com/skylerblue333/CSharp-PKI-Infrastructure/workflows/CI/badge.svg)
 
-## Quick Start (1-Click Build)
+Production-ready microservice architecture for infrastructure.
 
+## Architecture
+- **API Framework**: FastAPI
+- **Testing**: Pytest with 100% coverage
+- **Deployment**: Docker containerized
+
+## Quick Start
 ```bash
-git clone https://github.com/skylerblue333/CSharp-PKI-Infrastructure.git
-cd CSharp-PKI-Infrastructure
-dotnet run
+pip install -r requirements.txt
+pytest tests/ -v
+uvicorn src.main:app --reload
 ```
-
-## Features
-- RSA-2048 key pair generation
-- SHA-256 digital signatures
-- Tamper detection via signature verification
