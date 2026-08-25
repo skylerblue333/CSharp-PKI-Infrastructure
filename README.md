@@ -1,44 +1,49 @@
-<!-- PORTFOLIO PROJECT PROFILE: maintained by the repository owner -->
+# Sky X509 Lab
 
-## Project profile and code-audit snapshot
+Engineering-beta ASP.NET Core 8 service for generating bounded self-signed X.509 certificates for development and integration testing.
 
-**What this is:** **CSharp-PKI-Infrastructure** is a public repository described as: “Public Key Infrastructure implementation in C# with certificate management. #SkyCoin4444 #AI #Blockchain #DevOps #Innovation” Its dominant language signals are **C# (1 files)**.
+## What it does
 
-**Why it has value:** Its value is best understood through the implementation evidence currently present in the repository: **15 tracked files** were observed in the shallow audit, with the source structure and existing documentation providing the project’s specific context. This README does not treat a prototype, experiment, or archive as a production system without supporting evidence.
+- `POST /api/v1/certificates` creates a real self-signed RSA X.509 certificate.
+- Accepts a bounded X.500 subject, validity period of 1-397 days, and RSA key sizes of 2048/3072/4096 bits.
+- Returns PEM certificate material, serial number, SHA-256 fingerprint, validity window, and metadata.
+- Keeps only the latest 100 certificate artifacts in process memory.
+- `GET /api/v1/certificates` lists retained artifacts.
+- `GET /health` and `/ready` expose operational status.
+- CI verifies Release build, tests, vulnerable packages, container build, non-root execution, and runtime health.
 
-**Implementation evidence:** No test-related file was detected by filename heuristics.; 2 dependency or package manifest(s) detected; 2 build/CI/infrastructure signal(s) detected; and 3 documentation or governance file(s) detected. Test filenames observed include none detected. Dependency or package files include `CSharp-PKI-Infrastructure.csproj`, `package.json`. Build, CI, or infrastructure signals include `Dockerfile`, `.github/workflows/ci.yml`.
+## Example
 
-**Current status:** The repository is tracked on the `main` branch. The existing source tree, configuration, tests, workflows, and documentation remain authoritative for supported behavior and maturity. A code audit is not a production-readiness certification, and the presence of a test or workflow file does not establish that all checks pass.
+```bash
+curl -X POST http://localhost:8080/api/v1/certificates \
+  -H 'Content-Type: application/json' \
+  -d '{"subject":"CN=local.skycoin4444.test","validDays":30,"keySize":2048}'
+```
 
-**Relationship to the wider portfolio:** This repository is one focused component of the broader Skyler Blue Spillers portfolio across AI, software engineering, cloud and DevOps, cybersecurity, blockchain, finance, education, social systems, and creative work. It may provide a service boundary, implementation pattern, experiment, archive, or reusable idea for related repositories. Treat repositories as technical dependencies only where documented interfaces and verified project requirements support that relationship.
+## Run
 
-**Quality and security note:** No obvious secret-like pattern was detected by the limited static scan; this is not a substitute for a security audit. No TODO/FIXME marker was detected in the scanned text files.
+```bash
+dotnet restore CSharp-PKI-Infrastructure.csproj
+dotnet run --project CSharp-PKI-Infrastructure.csproj
+```
 
----
+Or:
 
-# Csharp Pki Infrastructure
+```bash
+docker build -t sky-x509-lab .
+docker run --rm -p 8080:8080 sky-x509-lab
+```
 
-![GitHub stars](https://img.shields.io/github/stars/skylerblue333/CSharp-PKI-Infrastructure?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/skylerblue333/CSharp-PKI-Infrastructure?style=flat-square)
+## Product status
 
-## 🌟 Overview
-**CSharp-PKI-Infrastructure** is a professional-grade project within the **SkyCoin4444** ecosystem. It focuses on delivering high-value solutions in the domain of **Software Development**.
+**Engineering beta / security lab.** This repository does not implement a certificate authority, CSR approval workflow, CA chain, revocation/CRL/OCSP, HSM/KMS key custody, private-key persistence/export, ACME, mTLS enrollment, RBAC, durable audit history, HA, or verified production deployment. Generated private keys exist only transiently during certificate creation and are not returned or retained.
 
-## 🚀 Key Features
-- **Scalable Architecture**: Designed for enterprise-level growth and performance.
-- **Modern Standards**: Implements best practices for clean code and maintainability.
-- **Robust Integration**: Built to work seamlessly within modern cloud-native environments.
+Use generated certificates for local development, test fixtures, and integration experiments—not as a production trust infrastructure.
 
-## 🛠️ Technology Stack
-- **Primary Domain**: Software Development
-- **Ecosystem**: SkyCoin4444 Digital Platform
+## SKYCOIN4444 integration
 
-## 📂 Structure
-The project is organized into a modular structure to ensure clarity and ease of development.
+Potential consumers should treat this as a development-only certificate fixture service behind a stable HTTP boundary. Production ecosystem identity/TLS infrastructure should use independently verified managed CA/KMS/HSM controls.
 
-## 👨‍💻 Author
-**Skyler Blue Spillers**
-*Professional Chess Player & Software Engineer*
+## License
 
----
-*Powered by SkyCoin4444*
+See `LICENSE`.
