@@ -1,5 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
 using Skycoin.X509Lab;
+using Xunit;
 
 namespace Skycoin.X509Lab.Tests;
 
