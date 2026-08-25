@@ -1,11 +1,39 @@
-name: CI
-on: [push, pull_request]
+name: x509-lab-ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - run: dotnet build
+      - name: Restore
+        run: dotnet restore CSharp-PKI-Infrastructure.csproj && dotnet restore tests/Sky.X509Lab.Tests.csproj
+      - name: Release build
+        run: dotnet build CSharp-PKI-Infrastructure.csproj -c Release --no-restore
+      - name: Tests
+        run: dotnet test tests/Sky.X509Lab.Tests.csproj -c Release --no-restore
+      - name: Vulnerable dependency report
+        run: dotnet list CSharp-PKI-Infrastructure.csproj package --vulnerable --include-transitive
+      - name: Build image
+        run: docker build -t sky-x509-lab:ci .
+      - name: Verify non-root image
+        run: test "$(docker image inspect sky-x509-lab:ci --format '{{.Config.User}}')" != "" && test "$(docker image inspect sky-x509-lab:ci --format '{{.Config.User}}')" != "0"
+      - name: Runtime health smoke
+        run: |
+          docker run -d --rm --name sky-x509-lab -p 8080:8080 sky-x509-lab:ci
+          trap 'docker stop sky-x509-lab || true' EXIT
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8080/health; then exit 0; fi
+            sleep 1
+          done
+          docker logs sky-x509-lab
+          exit 1
